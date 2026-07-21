@@ -32,10 +32,20 @@ Built with modern Android development practices, the project utilizes the **MVVM
 ---
 ## Screenshots
 
-|               Home Screen               |               Create Project               |               Roadmap Overview               |               Task Management               |
-|:---------------------------------------:|:------------------------------------------:|:--------------------------------------------:|:-------------------------------------------:|
-| ![](assets/screenshots/home-screen.png) | ![](assets/screenshots/create-project.png) | ![](assets/screenshots/roadmap-overview.png) | ![](assets/screenshots/task-management.png) |
 
+<p align="center">
+  <img src="assets/screenshots/home.png" width="22%">
+  <img src="assets/screenshots/create-project.png" width="22%">
+  <img src="assets/screenshots/roadmap-overview.png" width="22%">
+  <img src="assets/screenshots/task-management.png" width="22%">
+</p>
+
+<p align="center">
+  <b>Home Screen</b> •
+  <b>Create Project</b> •
+  <b>Roadmap Overview</b> •
+  <b>Task Management</b>
+</p>
 ---
 
 ## Project Structure
