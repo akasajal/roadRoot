@@ -34,7 +34,7 @@ Built with modern Android development practices, the project utilizes the **MVVM
 
 
 <p align="center">
-  <img src="assets/screenshots/home.png" width="22%">
+  <img src="assets/screenshots/home-screen.png" width="22%">
   <img src="assets/screenshots/create-project.png" width="22%">
   <img src="assets/screenshots/roadmap-overview.png" width="22%">
   <img src="assets/screenshots/task-management.png" width="22%">
