@@ -39,14 +39,7 @@ Built with modern Android development practices, the project utilizes the **MVVM
   <img src="assets/screenshots/task-management.png" width="24%">
 </p>
 
-<p align="center">
-  <sub><b>Home Screen</b></sub>&nbsp;&nbsp;&nbsp;&nbsp;
-  <sub><b>Create Project</b></sub>&nbsp;&nbsp;&nbsp;&nbsp;
-  <sub><b>Roadmap Overview</b></sub>&nbsp;&nbsp;&nbsp;&nbsp;
-  <sub><b>Task Management</b></sub>
-</p>
-
-
+---
 ## Project Structure
 
 The codebase follows a modular package structure aligned with the MVVM architecture:
