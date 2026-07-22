@@ -92,4 +92,5 @@ class RoadmapRepository @Inject constructor(
     // Stats
     suspend fun getTotalCount(projectId: Long) = dao.getTotalCount(projectId)
     suspend fun getDoneCount(projectId: Long) = dao.getDoneCount(projectId)
+    suspend fun getDiscardedCount(projectId: Long) = dao.getDiscardedCount(projectId)
 }

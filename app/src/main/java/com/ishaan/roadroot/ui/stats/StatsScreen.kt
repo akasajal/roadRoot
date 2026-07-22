@@ -68,6 +68,7 @@ fun StatsScreen(
                             StatCell(label = "Projects", value = "${state.projectCount}")
                             StatCell(label = "Total Items", value = "${state.totalItems}")
                             StatCell(label = "Completed", value = "${state.doneItems}")
+                            StatCell(label = "Discarded",value = "${state.discardedItems}")
                         }
                     }
                 }

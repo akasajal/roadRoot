@@ -13,15 +13,17 @@ import javax.inject.Inject
 data class ProjectStat(
     val project: Project,
     val total: Int,
-    val done: Int
+    val done: Int,
+    val discarded: Int
 ) {
-    val percent: Int get() = if (total == 0) 0 else (done * 100 / total)
+    val percent: Int get() = if (total == 0) 0 else ((done + discarded) * 100 / total)
 }
 
 data class StatsUiState(
     val projectCount: Int = 0,
     val totalItems: Int = 0,
     val doneItems: Int = 0,
+    val discardedItems: Int = 0,
     val projectStats: List<ProjectStat> = emptyList(),
     val isLoading: Boolean = true
 )
@@ -41,12 +43,20 @@ class StatsViewModel @Inject constructor(
                 val stats = projects.map { project ->
                     val total = roadmapRepo.getTotalCount(project.id)
                     val done = roadmapRepo.getDoneCount(project.id)
-                    ProjectStat(project, total, done)
+                    val discarded = roadmapRepo.getDiscardedCount(project.id)
+
+                    ProjectStat(
+                        project = project,
+                        total = total,
+                        done = done,
+                        discarded = discarded
+                    )
                 }
                 _state.value = StatsUiState(
                     projectCount = projects.size,
                     totalItems = stats.sumOf { it.total },
                     doneItems = stats.sumOf { it.done },
+                    discardedItems = stats.sumOf { it.discarded },
                     projectStats = stats,
                     isLoading = false
                 )
