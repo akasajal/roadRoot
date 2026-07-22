@@ -4,29 +4,87 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- RoadRoot icon: branching tree node motif -->
+
+    <!-- Root filled square -->
+    <path
+        android:fillColor="#4ADE80"
+        android:pathData="M42.93,77.62 h9.38 a1.68,1.68 0 0 1 1.68,1.68 v9.38 a0,0 0 0 1 0,0 h-9.38 a1.68,1.68 0 0 1 -1.68,-1.68 v-9.38 a0,0 0 0 1 0,0 Z" />
+
     <!-- Trunk -->
     <path
-        android:fillColor="#4ADE80"
-        android:pathData="M52,64 L52,78 Q52,80 54,80 L56,80 Q58,80 58,78 L58,64 Z" />
-    <!-- Root node -->
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="1.1"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M47.62,77.62 L47.62,59.19" />
+
+    <!-- Horizontal bar -->
     <path
-        android:fillColor="#4ADE80"
-        android:pathData="M54,58 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0" />
-    <!-- Left branch -->
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="1.1"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M30.87,59.19 L67.72,59.19" />
+
+    <!-- Left arm -->
     <path
-        android:fillColor="#4ADE80"
-        android:pathData="M44,58 L30,42 Q29,40 31,39 L33,38 Q35,37 36,39 L50,54 Z" />
-    <!-- Left leaf node -->
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="1.1"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M30.87,59.19 L30.87,44.12" />
+
+    <!-- Left single node (hollow square) -->
     <path
-        android:fillColor="#22C55E"
-        android:pathData="M30,36 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0" />
-    <!-- Right branch -->
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="0.9"
+        android:fillColor="#00000000"
+        android:pathData="M26.85,36.08 h8.04 a1.34,1.34 0 0 1 1.34,1.34 v8.04 a0,0 0 0 1 0,0 h-8.04 a1.34,1.34 0 0 1 -1.34,-1.34 v-8.04 a0,0 0 0 1 0,0 Z" />
+
+    <!-- Right arm -->
     <path
-        android:fillColor="#4ADE80"
-        android:pathData="M64,58 L78,42 Q79,40 77,39 L75,38 Q73,37 72,39 L58,54 Z" />
-    <!-- Right leaf node -->
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="1.1"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M67.72,59.19 L67.72,42.44" />
+
+    <!-- Right split horizontal -->
     <path
-        android:fillColor="#22C55E"
-        android:pathData="M78,36 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0" />
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="0.9"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M55.66,42.44 L79.78,42.44" />
+
+    <!-- Right-left vertical -->
+    <path
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="0.9"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M55.66,42.44 L55.66,29.04" />
+
+    <!-- Right-right vertical -->
+    <path
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="0.9"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M79.78,42.44 L79.78,29.04" />
+
+    <!-- Right-left leaf node (hollow square) -->
+    <path
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="0.9"
+        android:fillColor="#00000000"
+        android:pathData="M51.64,21.0 h8.04 a1.34,1.34 0 0 1 1.34,1.34 v8.04 a0,0 0 0 1 0,0 h-8.04 a1.34,1.34 0 0 1 -1.34,-1.34 v-9.38 a0,0 0 0 1 0,0 Z" />
+
+    <!-- Right-right leaf node (hollow square) -->
+    <path
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="0.9"
+        android:fillColor="#00000000"
+        android:pathData="M75.76,21.0 h8.04 a1.34,1.34 0 0 1 1.34,1.34 v8.04 a0,0 0 0 1 0,0 h-8.04 a1.34,1.34 0 0 1 -1.34,-1.34 v-9.38 a0,0 0 0 1 0,0 Z" />
+
 </vector>
