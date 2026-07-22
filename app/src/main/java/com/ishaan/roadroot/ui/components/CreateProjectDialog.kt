@@ -1,13 +1,19 @@
 package com.ishaan.roadroot.ui.components
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.ishaan.roadroot.model.ProjectAccent
@@ -16,11 +22,22 @@ import com.ishaan.roadroot.ui.theme.*
 @Composable
 fun CreateProjectDialog(
     onDismiss: () -> Unit,
-    onConfirm: (name: String, accent: ProjectAccent) -> Unit
+    onConfirm: (name: String, accent: ProjectAccent) -> Unit,
+    onImportJson: (uri: android.net.Uri) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var selectedAccent by remember { mutableStateOf(ProjectAccent.GREEN) }
     val focusRequester = remember { FocusRequester() }
+    val context = LocalContext.current
+
+    val jsonPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            onImportJson(uri)
+            onDismiss()
+        }
+    }
 
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
@@ -76,6 +93,29 @@ fun CreateProjectDialog(
                     selected = selectedAccent,
                     onSelect = { selectedAccent = it }
                 )
+
+                HorizontalDivider(color = RRBorder)
+
+                // Import from JSON
+                OutlinedButton(
+                    onClick = {
+                        jsonPickerLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = RROnSurfaceMuted),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, RRBorder)
+                ) {
+                    Icon(
+                        Icons.Outlined.FileOpen,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        "Import from JSON",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         },
         confirmButton = {

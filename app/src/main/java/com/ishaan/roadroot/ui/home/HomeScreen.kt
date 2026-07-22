@@ -27,6 +27,7 @@ import com.ishaan.roadroot.model.ProjectAccent
 import com.ishaan.roadroot.ui.components.*
 import com.ishaan.roadroot.ui.theme.*
 import com.ishaan.roadroot.viewmodel.ProjectViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -37,6 +38,10 @@ fun HomeScreen(
     viewModel: ProjectViewModel = hiltViewModel()
 ) {
     val projects by viewModel.projects.collectAsState()
+    val importResult by viewModel.importResult.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     var showCreateDialog by remember { mutableStateOf(false) }
     var showTemplateSheet by remember { mutableStateOf(false) }
@@ -46,55 +51,83 @@ fun HomeScreen(
     var projectToAction by remember { mutableStateOf<Project?>(null) }
     var projectToDelete by remember { mutableStateOf<Project?>(null) }
 
-    Box(modifier = Modifier.fillMaxSize().background(RRBackground)) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Header row
-            Row(
-                modifier = Modifier.fillMaxWidth().statusBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("RoadRoot", style = MaterialTheme.typography.headlineLarge, color = RROnBackground)
-                    Text("Your projects", style = MaterialTheme.typography.bodyMedium, color = RROnSurfaceMuted)
-                }
-                IconButton(onClick = onOpenSearch) {
-                    Icon(Icons.Outlined.Search, "Search", tint = RROnSurfaceMuted)
-                }
-                IconButton(onClick = onOpenStats) {
-                    Icon(Icons.Outlined.BarChart, "Stats", tint = RROnSurfaceMuted)
-                }
-            }
+    // Show import result as Snackbar
+    LaunchedEffect(importResult) {
+        if (importResult != null) {
+            scope.launch { snackbarHostState.showSnackbar(importResult!!) }
+            viewModel.clearImportResult()
+        }
+    }
 
-            if (projects.isEmpty()) {
-                EmptyState(modifier = Modifier.weight(1f).fillMaxWidth())
-            } else {
-                LazyColumn(
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 100.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+    Scaffold(
+        containerColor = RRBackground,
+        contentWindowInsets = WindowInsets(0),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showCreateDialog = true },
+                containerColor = RRAccent,
+                contentColor = Color(0xFF052E16),
+                shape = CircleShape,
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(bottom = 8.dp)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add project")
+            }
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(RRBackground)
+        ) {
+            Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+                // Header row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 20.dp,
+                            end = 20.dp,
+                            top = 8.dp,
+                            bottom = 20.dp
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    items(projects, key = { it.id }) { project ->
-                        val accent = ProjectAccent.fromArgb(project.accentColor)
-                        ProjectCard(
-                            project = project,
-                            accent = accent,
-                            onClick = { onOpenProject(project.id) },
-                            onLongClick = { projectToAction = project }
-                        )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("RoadRoot", style = MaterialTheme.typography.headlineLarge, color = RROnBackground)
+                        Text("Your projects", style = MaterialTheme.typography.bodyMedium, color = RROnSurfaceMuted)
+                    }
+                    IconButton(onClick = onOpenSearch) {
+                        Icon(Icons.Outlined.Search, "Search", tint = RROnSurfaceMuted)
+                    }
+                    IconButton(onClick = onOpenStats) {
+                        Icon(Icons.Outlined.BarChart, "Stats", tint = RROnSurfaceMuted)
+                    }
+                }
+
+                if (projects.isEmpty()) {
+                    EmptyState(modifier = Modifier.weight(1f).fillMaxWidth())
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 100.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(projects, key = { it.id }) { project ->
+                            val accent = ProjectAccent.fromArgb(project.accentColor)
+                            ProjectCard(
+                                project = project,
+                                accent = accent,
+                                onClick = { onOpenProject(project.id) },
+                                onLongClick = { projectToAction = project }
+                            )
+                        }
                     }
                 }
             }
-        }
-
-        FloatingActionButton(
-            onClick = { showCreateDialog = true },
-            containerColor = RRAccent,
-            contentColor = Color(0xFF052E16),
-            shape = CircleShape,
-            modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(24.dp)
-        ) {
-            Icon(Icons.Default.Add, "Add project")
         }
     }
 
@@ -107,6 +140,9 @@ fun HomeScreen(
                 pendingAccent = accent
                 showCreateDialog = false
                 showTemplateSheet = true
+            },
+            onImportJson = { uri ->
+                viewModel.importFromJson(uri)
             }
         )
     }
