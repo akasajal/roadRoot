@@ -13,20 +13,59 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.ishaan.roadroot.ui.theme.*
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
+
+
 data class RoadmapTemplate(
     val name: String,
-    val icon: String,
+    val icon: ImageVector,
     val items: List<String>
 )
 
 val TEMPLATES = listOf(
-    RoadmapTemplate("Android App", "📱", listOf("Planning", "UI", "Backend", "Testing", "Publishing")),
-    RoadmapTemplate("Novel", "📖", listOf("Outline", "Characters", "Draft", "Editing", "Publishing")),
-    RoadmapTemplate("Portfolio", "🎨", listOf("Design", "Projects", "Deployment", "SEO", "Outreach")),
-    RoadmapTemplate("Research", "🔬", listOf("Literature Review", "Methodology", "Data Collection", "Analysis", "Write-up")),
-    RoadmapTemplate("Game", "🎮", listOf("Concept", "Prototype", "Core Loop", "Levels", "Polish", "Release")),
-    RoadmapTemplate("Startup", "🚀", listOf("Idea Validation", "MVP", "Beta", "Launch", "Growth")),
-    RoadmapTemplate("Blank", "⬜", emptyList())
+    RoadmapTemplate(
+        "Web Development",
+        Icons.Outlined.Language,
+        listOf("Planning", "Design UI/UX", "Frontend", "Backend", "Content Integration", "Testing", "Deployment")
+    ),
+    RoadmapTemplate(
+        "Android App",
+        Icons.Outlined.Android,
+        listOf("Planning", "UI", "Backend", "Testing", "Publishing")
+    ),
+    RoadmapTemplate(
+        "Novel",
+        Icons.Outlined.MenuBook,
+        listOf("Outline", "Characters", "Draft", "Editing", "Publishing")
+    ),
+    RoadmapTemplate(
+        "Portfolio",
+        Icons.Outlined.WorkspacePremium,
+        listOf("Design", "Projects", "Deployment", "SEO", "Outreach")
+    ),
+    RoadmapTemplate(
+        "Research",
+        Icons.Outlined.Science,
+        listOf("Literature Review", "Methodology", "Data Collection", "Analysis", "Write-up")
+    ),
+    RoadmapTemplate(
+        "Game",
+        Icons.Outlined.SportsEsports,
+        listOf("Concept", "Prototype", "Core Loop", "Levels", "Polish", "Release")
+    ),
+    RoadmapTemplate(
+        "Startup",
+        Icons.Outlined.RocketLaunch,
+        listOf("Idea Validation", "MVP", "Beta", "Launch", "Growth")
+    ),
+    RoadmapTemplate(
+        "Blank",
+        Icons.Outlined.AddCircleOutline,
+        emptyList()
+    )
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,11 +88,24 @@ fun TemplateSheet(
             LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 items(TEMPLATES) { template ->
                     Row(
-                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
-                            .clickable { onSelectTemplate(template); onDismiss() }
-                            .padding(vertical = 14.dp, horizontal = 4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                onSelectTemplate(template)
+                                onDismiss()
+                            }
+                            .padding(vertical = 14.dp, horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(template.icon, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(end = 14.dp))
+                        Icon(
+                            imageVector = template.icon,
+                            contentDescription = null,
+                            tint = RRAccent,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(end = 14.dp)
+                        )
                         Column {
                             Text(template.name, style = MaterialTheme.typography.titleLarge, color = RROnBackground)
                             if (template.items.isNotEmpty()) {
