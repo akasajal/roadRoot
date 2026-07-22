@@ -5,6 +5,9 @@
 RoadRoot is a native Android roadmap and project planning application engineered with **Jetpack Compose**. Designed to streamline productivity, it enables developers and creators to decompose complex goals into structured milestones, manage concurrent projects, and visualize end-to-end progress through a clean, modern interface.
 
 ---
+[![Download APK](https://img.shields.io/badge/Download-APK-4ADE80?style=for-the-badge&logo=android)](https://github.com/akasajal/roadRoot/releases/latest)
+
+---
 
 ## Architecture & Tech Stack
 
