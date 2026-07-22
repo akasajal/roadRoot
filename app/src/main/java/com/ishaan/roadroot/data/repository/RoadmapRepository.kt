@@ -48,10 +48,9 @@ class RoadmapRepository @Inject constructor(
         val children = allItems.filter { it.parentId == itemId }
         if (children.isEmpty()) {
             return when (allItems.find { it.id == itemId }?.status) {
-                ItemStatus.DONE -> 1f
+                ItemStatus.DONE, ItemStatus.DISCARDED -> 1f
                 ItemStatus.IN_PROGRESS -> 0.5f
                 ItemStatus.TODO,
-                ItemStatus.DISCARDED,
                 null -> 0f
             }
         }
@@ -71,7 +70,7 @@ class RoadmapRepository @Inject constructor(
                 ItemStatus.DONE -> 1f
                 ItemStatus.IN_PROGRESS -> 0.5f
                 ItemStatus.TODO,
-                ItemStatus.DISCARDED -> 0f
+                ItemStatus.DISCARDED -> 1f
             } else computeProgress(item.id, allItems)
             RoadmapItemWithProgress(item = item, progress = progress, childCount = childCount, isLeaf = isLeaf)
         }
