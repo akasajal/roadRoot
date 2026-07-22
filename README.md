@@ -30,16 +30,6 @@ Built with modern Android development practices, the project utilizes the **MVVM
 * **Offline-First Architecture:** Reliable local data persistence powered by Room Database, ensuring zero data loss and instant load times.
 
 ---
-## Screenshots
-
-<p align="center">
-  <img src="assets/screenshots/home-screen.png" width="24%">
-  <img src="assets/screenshots/create-project.png" width="24%">
-  <img src="assets/screenshots/roadmap-overview.png" width="24%">
-  <img src="assets/screenshots/task-management.png" width="24%">
-</p>
-
----
 ## Project Structure
 
 The codebase follows a modular package structure aligned with the MVVM architecture:
