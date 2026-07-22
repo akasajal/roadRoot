@@ -1,7 +1,6 @@
 package com.ishaan.roadroot.ui.roadmap
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -9,6 +8,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -18,10 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -31,6 +35,8 @@ import com.ishaan.roadroot.model.RoadmapItemWithProgress
 import com.ishaan.roadroot.ui.components.*
 import com.ishaan.roadroot.ui.theme.*
 import com.ishaan.roadroot.viewmodel.RoadmapViewModel
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun RoadmapScreen(
@@ -50,7 +56,6 @@ fun RoadmapScreen(
     val screenTitle = uiState.currentItem?.title ?: projectName
     val parentName = if (isRoot) "Projects" else projectName
 
-    // Description: project desc at root, item desc otherwise
     val descriptionSource = if (isRoot) uiState.project?.description ?: ""
                             else uiState.currentItem?.description ?: ""
     var descriptionText by remember(uiState.currentItem?.id, uiState.project?.id) {
@@ -60,14 +65,19 @@ fun RoadmapScreen(
 
     val accent = ProjectAccent.fromArgb(uiState.project?.accentColor ?: ProjectAccent.GREEN.argb)
 
-    // Drag & drop state
-    var dragIndex by remember { mutableStateOf<Int?>(null) }
+    // Reorderable list state
     var items by remember(uiState.children) { mutableStateOf(uiState.children) }
     LaunchedEffect(uiState.children) { items = uiState.children }
 
-    Box(
-        modifier = Modifier.fillMaxSize().background(RRBackground)
-    ) {
+    val lazyListState = rememberLazyListState()
+    val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        val mutable = items.toMutableList()
+        val moved = mutable.removeAt(from.index - 1) // -1 because of header item
+        mutable.add(to.index - 1, moved)
+        items = mutable
+    }
+
+    Box(modifier = Modifier.fillMaxSize().background(RRBackground)) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Top bar
             Row(
@@ -76,35 +86,23 @@ fun RoadmapScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = RROnSurface)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = RROnSurface)
                 }
                 Column(modifier = Modifier.weight(1f).padding(start = 4.dp)) {
                     Text(parentName, style = MaterialTheme.typography.labelMedium, color = RROnSurfaceMuted)
-                    Text(
-                        screenTitle,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = RROnBackground,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Text(screenTitle, style = MaterialTheme.typography.headlineMedium, color = RROnBackground, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                // Accent dot showing project color
-                Box(
-                    modifier = Modifier.padding(end = 12.dp).size(10.dp)
-                        .clip(CircleShape).background(accent.color)
-                )
+                Box(modifier = Modifier.padding(end = 12.dp).size(10.dp).clip(CircleShape).background(accent.color))
             }
 
-            val listState = rememberLazyListState()
-
             LazyColumn(
-                state = listState,
+                state = lazyListState,
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 100.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Description (project at root, item description otherwise)
-                item {
+                // Header: description + divider (key = "header" keeps it outside reorder scope)
+                item(key = "header") {
                     DescriptionField(
                         value = descriptionText,
                         accentColor = accent.color,
@@ -125,45 +123,24 @@ fun RoadmapScreen(
                 }
 
                 if (items.isEmpty() && !uiState.isLoading) {
-                    item { EmptyRoadmapState(contextName = screenTitle) }
+                    item(key = "empty") { EmptyRoadmapState(contextName = screenTitle) }
                 }
 
-                // #2 Drag & drop list
-                itemsIndexed(items, key = { _, it -> it.item.id }) { index, item ->
-                    val isDragging = dragIndex == index
-                    RoadmapItemCard(
-                        item = item,
-                        onClick = { onNavigateToItem(item.item.projectId, item.item.id) },
-                        onLongClick = { actionItem = item },
-                        childTitles = uiState.childPreview[item.item.id] ?: emptyList(),
-                        modifier = Modifier
-                            .zIndex(if (isDragging) 1f else 0f)
-                            .then(if (isDragging) Modifier.shadow(8.dp, RoundedCornerShape(10.dp)) else Modifier)
-                            .pointerInput(items) {
-                                detectDragGesturesAfterLongPress(
-                                    onDragStart = { dragIndex = index },
-                                    onDragEnd = {
-                                        viewModel.reorderItems(items)
-                                        dragIndex = null
-                                    },
-                                    onDragCancel = { dragIndex = null },
-                                    onDrag = { change, dragAmount ->
-                                        change.consume()
-                                        val currentDrag = dragIndex ?: return@detectDragGesturesAfterLongPress
-                                        val itemHeightPx = 80.dp.toPx() // approx
-                                        val targetIndex = (currentDrag + (dragAmount.y / itemHeightPx).toInt())
-                                            .coerceIn(0, items.lastIndex)
-                                        if (targetIndex != currentDrag) {
-                                            val mutable = items.toMutableList()
-                                            val moved = mutable.removeAt(currentDrag)
-                                            mutable.add(targetIndex, moved)
-                                            items = mutable
-                                            dragIndex = targetIndex
-                                        }
-                                    }
-                                )
-                            }
-                    )
+                itemsIndexed(items, key = { _, it -> it.item.id }) { _, item ->
+                    ReorderableItem(reorderableState, key = item.item.id) { isDragging ->
+                        RoadmapItemCard(
+                            item = item,
+                            onClick = { onNavigateToItem(item.item.projectId, item.item.id) },
+                            onLongClick = { actionItem = item },
+                            childTitles = uiState.childPreview[item.item.id] ?: emptyList(),
+                            modifier = Modifier
+                                .zIndex(if (isDragging) 1f else 0f)
+                                .then(if (isDragging) Modifier.shadow(8.dp, RoundedCornerShape(10.dp)) else Modifier),
+                            dragModifier = Modifier.draggableHandle(
+                                onDragStopped = { viewModel.reorderItems(items) }
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -175,7 +152,7 @@ fun RoadmapScreen(
             shape = CircleShape,
             modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(24.dp)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Add item")
+            Icon(Icons.Default.Add, "Add item")
         }
     }
 
@@ -227,6 +204,8 @@ private fun DescriptionField(
     onFocusLost: () -> Unit
 ) {
     var focused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
     Box(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
@@ -245,6 +224,11 @@ private fun DescriptionField(
             },
             textStyle = MaterialTheme.typography.bodyMedium.copy(color = RROnSurface),
             cursorBrush = SolidColor(accentColor),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = {
+                onFocusLost()
+                focusManager.clearFocus()
+            }),
             onTextLayout = {}
         )
     }
@@ -252,10 +236,7 @@ private fun DescriptionField(
 
 @Composable
 private fun EmptyRoadmapState(contextName: String) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(top = 60.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 60.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Text("Nothing here yet", style = MaterialTheme.typography.headlineMedium, color = RROnSurfaceMuted)
         Spacer(Modifier.height(6.dp))
         Text("Tap + to add items to $contextName", style = MaterialTheme.typography.bodyMedium, color = RROnSurfaceSubtle)
