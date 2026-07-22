@@ -11,6 +11,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AccountTree
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,8 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ishaan.roadroot.model.Project
 import com.ishaan.roadroot.model.ProjectAccent
-import com.ishaan.roadroot.ui.components.CreateProjectDialog
-import com.ishaan.roadroot.ui.components.DeleteConfirmDialog
+import com.ishaan.roadroot.ui.components.*
 import com.ishaan.roadroot.ui.theme.*
 import com.ishaan.roadroot.viewmodel.ProjectViewModel
 
@@ -31,50 +32,46 @@ import com.ishaan.roadroot.viewmodel.ProjectViewModel
 @Composable
 fun HomeScreen(
     onOpenProject: (Long) -> Unit,
+    onOpenSearch: () -> Unit,
+    onOpenStats: () -> Unit,
     viewModel: ProjectViewModel = hiltViewModel()
 ) {
     val projects by viewModel.projects.collectAsState()
 
-    var showAddDialog by remember { mutableStateOf(false) }
+    var showCreateDialog by remember { mutableStateOf(false) }
+    var showTemplateSheet by remember { mutableStateOf(false) }
+    var templatePicked by remember { mutableStateOf(false) }
+    var pendingProjectName by remember { mutableStateOf("") }
+    var pendingAccent by remember { mutableStateOf(ProjectAccent.GREEN) }
     var projectToAction by remember { mutableStateOf<Project?>(null) }
     var projectToDelete by remember { mutableStateOf<Project?>(null) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(RRBackground)
-    ) {
+    Box(modifier = Modifier.fillMaxSize().background(RRBackground)) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 20.dp)
+            // Header row
+            Row(
+                modifier = Modifier.fillMaxWidth().statusBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 20.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(
-                        text = "RoadRoot",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = RROnBackground
-                    )
-                    Text(
-                        text = "Your projects",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = RROnSurfaceMuted
-                    )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("RoadRoot", style = MaterialTheme.typography.headlineLarge, color = RROnBackground)
+                    Text("Your projects", style = MaterialTheme.typography.bodyMedium, color = RROnSurfaceMuted)
+                }
+                IconButton(onClick = onOpenSearch) {
+                    Icon(Icons.Outlined.Search, "Search", tint = RROnSurfaceMuted)
+                }
+                IconButton(onClick = onOpenStats) {
+                    Icon(Icons.Outlined.BarChart, "Stats", tint = RROnSurfaceMuted)
                 }
             }
 
             if (projects.isEmpty()) {
-                EmptyState(
-                    modifier = Modifier.weight(1f).fillMaxWidth()
-                )
+                EmptyState(modifier = Modifier.weight(1f).fillMaxWidth())
             } else {
                 LazyColumn(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
-                    contentPadding = PaddingValues(
-                        start = 16.dp, end = 16.dp, top = 4.dp, bottom = 100.dp
-                    ),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 100.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(projects, key = { it.id }) { project ->
@@ -91,23 +88,44 @@ fun HomeScreen(
         }
 
         FloatingActionButton(
-            onClick = { showAddDialog = true },
+            onClick = { showCreateDialog = true },
             containerColor = RRAccent,
             contentColor = Color(0xFF052E16),
             shape = CircleShape,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .navigationBarsPadding()
-                .padding(24.dp)
+            modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(24.dp)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Add project")
+            Icon(Icons.Default.Add, "Add project")
         }
     }
 
-    if (showAddDialog) {
+    // Create project dialog → then template sheet
+    if (showCreateDialog) {
         CreateProjectDialog(
-            onDismiss = { showAddDialog = false },
-            onConfirm = { name, accent -> viewModel.createProject(name, accent.argb) }
+            onDismiss = { showCreateDialog = false },
+            onConfirm = { name, accent ->
+                pendingProjectName = name
+                pendingAccent = accent
+                showCreateDialog = false
+                showTemplateSheet = true
+            }
+        )
+    }
+
+    if (showTemplateSheet) {
+        TemplateSheet(
+            onDismiss = {
+                showTemplateSheet = false
+                // Only create a blank project if user dismissed without picking a template
+                if (!templatePicked) {
+                    viewModel.createProject(pendingProjectName, pendingAccent.argb)
+                }
+                templatePicked = false
+            },
+            onSelectTemplate = { template ->
+                templatePicked = true
+                showTemplateSheet = false
+                viewModel.createProjectFromTemplate(pendingProjectName, pendingAccent.argb, template.items)
+            }
         )
     }
 
@@ -132,82 +150,36 @@ fun HomeScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ProjectCard(
-    project: Project,
-    accent: ProjectAccent,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit
-) {
+private fun ProjectCard(project: Project, accent: ProjectAccent, onClick: () -> Unit, onLongClick: () -> Unit) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(RRSurfaceVariant)
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(RRSurfaceVariant)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .padding(horizontal = 18.dp, vertical = 16.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(accent.color.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.AccountTree,
-                    contentDescription = null,
-                    tint = accent.color,
-                    modifier = Modifier.size(20.dp)
-                )
+            Box(modifier = Modifier.size(38.dp).clip(RoundedCornerShape(8.dp)).background(accent.color.copy(alpha = 0.15f)), contentAlignment = Alignment.Center) {
+                Icon(Icons.Outlined.AccountTree, null, tint = accent.color, modifier = Modifier.size(20.dp))
             }
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = project.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = RROnBackground,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Text(project.name, style = MaterialTheme.typography.titleLarge, color = RROnBackground, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (project.description.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = project.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = RROnSurfaceMuted,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(project.description, style = MaterialTheme.typography.bodySmall, color = RROnSurfaceMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
-            // Accent dot
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(accent.color)
-            )
+            Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(accent.color))
         }
     }
 }
 
 @Composable
 private fun EmptyState(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.AccountTree,
-            contentDescription = null,
-            tint = RROnSurfaceSubtle,
-            modifier = Modifier.size(48.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Icon(Icons.Outlined.AccountTree, null, tint = RROnSurfaceSubtle, modifier = Modifier.size(48.dp))
+        Spacer(Modifier.height(16.dp))
         Text("No projects yet", style = MaterialTheme.typography.headlineMedium, color = RROnSurfaceMuted)
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(Modifier.height(6.dp))
         Text("Tap + to start your first roadmap", style = MaterialTheme.typography.bodyMedium, color = RROnSurfaceSubtle)
     }
 }

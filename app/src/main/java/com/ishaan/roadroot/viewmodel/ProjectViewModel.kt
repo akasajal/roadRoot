@@ -3,6 +3,7 @@ package com.ishaan.roadroot.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ishaan.roadroot.data.repository.ProjectRepository
+import com.ishaan.roadroot.data.repository.RoadmapRepository
 import com.ishaan.roadroot.model.Project
 import com.ishaan.roadroot.model.ProjectAccent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProjectViewModel @Inject constructor(
-    private val repo: ProjectRepository
+    private val repo: ProjectRepository,
+    private val roadmapRepo: RoadmapRepository
 ) : ViewModel() {
 
     val projects: StateFlow<List<Project>> = repo.getAllProjects()
@@ -25,13 +27,23 @@ class ProjectViewModel @Inject constructor(
         viewModelScope.launch { repo.createProject(name, accentColor = accentColor) }
     }
 
+    fun createProjectFromTemplate(name: String, accentColor: Int, templateItems: List<String>) {
+        if (name.isBlank()) return
+        viewModelScope.launch {
+            val projectId = repo.createProject(name, accentColor = accentColor)
+            templateItems.forEachIndexed { index, title ->
+                roadmapRepo.createItem(projectId, null, title)
+            }
+        }
+    }
+
     fun renameProject(project: Project, newName: String) {
         if (newName.isBlank()) return
         viewModelScope.launch { repo.renameProject(project, newName) }
     }
 
     fun updateDescription(project: Project, description: String) {
-        viewModelScope.launch { repo.updateProject(project.copy(description = description)) }
+        viewModelScope.launch { repo.updateDescription(project, description) }
     }
 
     fun updateAccentColor(project: Project, accent: ProjectAccent) {

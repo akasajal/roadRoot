@@ -3,6 +3,7 @@ package com.ishaan.roadroot.di
 import android.content.Context
 import androidx.room.Room
 import com.ishaan.roadroot.data.db.MIGRATION_1_2
+import com.ishaan.roadroot.data.db.MIGRATION_2_3
 import com.ishaan.roadroot.data.db.ProjectDao
 import com.ishaan.roadroot.data.db.RoadRootDatabase
 import com.ishaan.roadroot.data.db.RoadmapItemDao
@@ -25,7 +26,7 @@ object DatabaseModule {
             RoadRootDatabase::class.java,
             "roadroot.db"
         )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     }
 

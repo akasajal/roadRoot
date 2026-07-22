@@ -11,24 +11,24 @@ class ProjectRepository @Inject constructor(
     private val dao: ProjectDao
 ) {
     fun getAllProjects(): Flow<List<Project>> = dao.getAllProjects()
-
     suspend fun getProjectById(id: Long): Project? = dao.getProjectById(id)
 
     suspend fun createProject(name: String, description: String = "", accentColor: Int): Long {
-        return dao.insertProject(
-            Project(name = name.trim(), description = description.trim(), accentColor = accentColor)
-        )
+        return dao.insertProject(Project(name = name.trim(), description = description.trim(), accentColor = accentColor))
     }
 
     suspend fun updateProject(project: Project) = dao.updateProject(project)
-
     suspend fun deleteProject(project: Project) = dao.deleteProject(project)
 
-    suspend fun renameProject(project: Project, newName: String) {
+    suspend fun renameProject(project: Project, newName: String) =
         dao.updateProject(project.copy(name = newName.trim()))
-    }
 
-    suspend fun updateAccentColor(project: Project, accentColor: Int) {
+    suspend fun updateAccentColor(project: Project, accentColor: Int) =
         dao.updateProject(project.copy(accentColor = accentColor))
-    }
+
+    suspend fun updateDescription(project: Project, description: String) =
+        dao.updateProject(project.copy(description = description.trim()))
+
+    suspend fun searchProjects(query: String): List<Project> = dao.searchProjects(query)
+    suspend fun getProjectCount(): Int = dao.getProjectCount()
 }

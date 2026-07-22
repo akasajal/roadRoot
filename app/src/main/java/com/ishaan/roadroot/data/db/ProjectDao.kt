@@ -13,6 +13,9 @@ interface ProjectDao {
     @Query("SELECT * FROM projects WHERE id = :id")
     suspend fun getProjectById(id: Long): Project?
 
+    @Query("SELECT * FROM projects WHERE name LIKE '%' || :query || '%'")
+    suspend fun searchProjects(query: String): List<Project>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProject(project: Project): Long
 
@@ -24,4 +27,8 @@ interface ProjectDao {
 
     @Query("UPDATE projects SET sortOrder = :order WHERE id = :id")
     suspend fun updateSortOrder(id: Long, order: Int)
+
+    // Stats
+    @Query("SELECT COUNT(*) FROM projects")
+    suspend fun getProjectCount(): Int
 }

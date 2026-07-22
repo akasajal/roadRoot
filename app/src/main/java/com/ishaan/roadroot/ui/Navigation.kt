@@ -9,12 +9,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ishaan.roadroot.ui.home.HomeScreen
 import com.ishaan.roadroot.ui.roadmap.RoadmapScreen
+import com.ishaan.roadroot.ui.search.SearchScreen
+import com.ishaan.roadroot.ui.stats.StatsScreen
 import com.ishaan.roadroot.viewmodel.ProjectViewModel
 
 @Composable
 fun RoadRootNavGraph() {
     val navController = rememberNavController()
-    // Shared ProjectViewModel so HomeScreen and nav logic can look up project names
     val projectViewModel: ProjectViewModel = hiltViewModel()
     val projects by projectViewModel.projects.collectAsState()
 
@@ -26,8 +27,23 @@ fun RoadRootNavGraph() {
                 onOpenProject = { projectId ->
                     val name = projects.find { it.id == projectId }?.name?.encode() ?: "Project"
                     navController.navigate("roadmap/$projectId/$name/-1")
+                },
+                onOpenSearch = { navController.navigate("search") },
+                onOpenStats = { navController.navigate("stats") }
+            )
+        }
+
+        composable("search") {
+            SearchScreen(
+                onBack = { navController.popBackStack() },
+                onOpenItem = { projectId, projectName, itemId ->
+                    navController.navigate("roadmap/$projectId/${projectName.encode()}/$itemId")
                 }
             )
+        }
+
+        composable("stats") {
+            StatsScreen(onBack = { navController.popBackStack() })
         }
 
         composable(
@@ -38,16 +54,12 @@ fun RoadRootNavGraph() {
                 navArgument("itemId") { type = NavType.LongType }
             )
         ) { backStackEntry ->
-            val projectName = backStackEntry.arguments
-                ?.getString("projectName")
-                ?.decode() ?: "Project"
-
+            val projectName = backStackEntry.arguments?.getString("projectName")?.decode() ?: "Project"
             RoadmapScreen(
                 projectName = projectName,
                 onBack = { navController.popBackStack() },
                 onNavigateToItem = { projectId, itemId ->
-                    val name = projectName.encode()
-                    navController.navigate("roadmap/$projectId/$name/$itemId")
+                    navController.navigate("roadmap/$projectId/${projectName.encode()}/$itemId")
                 }
             )
         }

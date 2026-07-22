@@ -28,10 +28,11 @@ data class RoadmapItem(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val projectId: Long,
-    val parentId: Long?, // null = root level
+    val parentId: Long?,
     val title: String,
     val description: String = "",
     val status: ItemStatus = ItemStatus.TODO,
+    val dueDate: Long? = null,          // epoch millis, null = no due date
     val createdAt: Long = System.currentTimeMillis(),
     val sortOrder: Int = 0
 )
