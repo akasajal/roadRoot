@@ -7,6 +7,8 @@ RoadRoot is a native Android roadmap and project planning application engineered
 ---
 [![Download APK](https://img.shields.io/badge/Download-APK-4ADE80?style=for-the-badge&logo=android)](https://github.com/akasajal/roadRoot/releases/latest)
 
+[About RootRoad](ABOUT.md)
+
 ---
 
 ## Architecture & Tech Stack
@@ -33,6 +35,7 @@ Built with modern Android development practices, the project utilizes the **MVVM
 * **Offline-First Architecture:** Reliable local data persistence powered by Room Database, ensuring zero data loss and instant load times.
 
 ---
+
 ## Project Structure
 
 The codebase follows a modular package structure aligned with the MVVM architecture:
@@ -46,8 +49,11 @@ app/
 ├── model/               # Domain models and data classes
 ├── ui/
 │   ├── components/      # Reusable Jetpack Compose UI widgets
+│   ├── exports/         # Supports project export in .json and .md format
 │   ├── home/            # Home screen view and navigation
 │   ├── roadmap/         # Roadmap timeline and task execution views
+│   ├── search/          # Search Project and items
+│   ├── stats/           # Statistics view
 │   └── theme/           # Material 3 styling, colors, and typography
 └── viewmodel/           # UI state management and business logic
 
@@ -77,20 +83,6 @@ git clone https://github.com/akasajal/roadRoot.git
    Launch Android Studio, select **Open an Existing Project**, and navigate to the cloned directory.
 3. **Build and Run**
    Allow Gradle to synchronize dependencies, select your target emulator or physical device, and click **Run** (`Shift + F10`).
-
----
-
-## Roadmap & Future Enhancements
-
-The following capabilities are planned for upcoming releases:
-
-* **Time Management:** Target due dates and timeline scheduling.
-* **Reminders:** Push notifications for approaching milestones.
-* **Advanced Navigation:** Full-text search and multi-tag filtering.
-* **Data Portability:** Local database backup and restore functionality.
-* **Analytics:** Visual statistics and historical completion graphs.
-* **Home Screen Integration:** Interactive Android home screen widgets.
-* **Remote Synchronization:** Cloud-based storage and multi-device sync.
 
 ---
 
