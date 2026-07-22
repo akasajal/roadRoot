@@ -107,4 +107,4 @@ To contribute:
 
 ## License
 
-This software is released under the **MIT License**. See the `LICENSE` file for additional details.
+This software is released under the **MIT License**.
