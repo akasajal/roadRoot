@@ -24,6 +24,7 @@ val RROnSurfaceSubtle = Color(0xFF334155)
 val RRStatusDone = Color(0xFF4ADE80)
 val RRStatusInProgress = Color(0xFFFBBF24)
 val RRStatusTodo = Color(0xFF475569)
+val RRStatusDiscarded = Color(0xFFCB4C4E)
 
 // Divider / border
 val RRBorder = Color(0xFF1E293B)

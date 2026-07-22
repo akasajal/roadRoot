@@ -85,6 +85,7 @@ fun ItemActionSheet(
                     StatusChip("To Do",       item.item.status == ItemStatus.TODO,        RRStatusTodo)       { onStatusChange(ItemStatus.TODO); onDismiss() }
                     StatusChip("In Progress", item.item.status == ItemStatus.IN_PROGRESS, RRStatusInProgress) { onStatusChange(ItemStatus.IN_PROGRESS); onDismiss() }
                     StatusChip("Done",        item.item.status == ItemStatus.DONE,        RRStatusDone)       { onStatusChange(ItemStatus.DONE); onDismiss() }
+                    StatusChip("Discarded",   item.item.status == ItemStatus.DISCARDED,   RRStatusDiscarded)  { onStatusChange(ItemStatus.DISCARDED); onDismiss() }
                 }
             }
             Spacer(Modifier.height(8.dp))

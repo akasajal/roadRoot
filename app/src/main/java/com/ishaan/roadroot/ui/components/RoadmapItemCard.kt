@@ -45,12 +45,14 @@ fun RoadmapItemCard(
         ItemStatus.DONE -> RRStatusDone
         ItemStatus.IN_PROGRESS -> RRStatusInProgress
         ItemStatus.TODO -> RRStatusTodo
+        ItemStatus.DISCARDED -> RRStatusDiscarded
     }
 
     val now = System.currentTimeMillis()
     val isOverdue = item.item.dueDate != null &&
             item.item.dueDate < now &&
-            item.effectiveStatus != ItemStatus.DONE
+            item.effectiveStatus != ItemStatus.DONE &&
+            item.effectiveStatus != ItemStatus.DISCARDED
 
     Box(
         modifier = modifier

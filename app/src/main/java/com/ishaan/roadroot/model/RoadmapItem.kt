@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 enum class ItemStatus {
-    TODO, IN_PROGRESS, DONE
+    TODO, IN_PROGRESS, DONE, DISCARDED
 }
 
 @Entity(

@@ -50,7 +50,9 @@ class RoadmapRepository @Inject constructor(
             return when (allItems.find { it.id == itemId }?.status) {
                 ItemStatus.DONE -> 1f
                 ItemStatus.IN_PROGRESS -> 0.5f
-                else -> 0f
+                ItemStatus.TODO,
+                ItemStatus.DISCARDED,
+                null -> 0f
             }
         }
         return children.map { computeProgress(it.id, allItems) }.average().toFloat()
@@ -66,7 +68,10 @@ class RoadmapRepository @Inject constructor(
             val childCount = allItems.count { it.parentId == item.id }
             val isLeaf = childCount == 0
             val progress = if (isLeaf) when (item.status) {
-                ItemStatus.DONE -> 1f; ItemStatus.IN_PROGRESS -> 0.5f; else -> 0f
+                ItemStatus.DONE -> 1f
+                ItemStatus.IN_PROGRESS -> 0.5f
+                ItemStatus.TODO,
+                ItemStatus.DISCARDED -> 0f
             } else computeProgress(item.id, allItems)
             RoadmapItemWithProgress(item = item, progress = progress, childCount = childCount, isLeaf = isLeaf)
         }
