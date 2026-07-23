@@ -30,7 +30,7 @@ fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val overallPercent = if (state.totalItems == 0) 0f else state.doneItems.toFloat() / state.totalItems
+    val overallPercent = if (state.totalItems == 0) 0f else (state.doneItems + state.discardedItems).toFloat() / state.totalItems
 
     Column(modifier = Modifier.fillMaxSize().background(RRBackground)) {
         Row(

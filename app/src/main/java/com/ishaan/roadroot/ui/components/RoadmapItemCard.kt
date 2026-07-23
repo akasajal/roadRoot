@@ -128,14 +128,12 @@ fun RoadmapItemCard(
                 if (!item.isLeaf && childTitles.isNotEmpty()) {
                     Spacer(Modifier.height(10.dp))
                     Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                        childTitles.take(4).forEach { title ->
+                        childTitles.forEachIndexed { index, title ->
+                            val connector = if (index == childTitles.lastIndex) "└──" else "├──"
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("├─", style = MaterialTheme.typography.labelSmall, color = RROnSurfaceSubtle, modifier = Modifier.padding(end = 6.dp))
+                                Text(connector, style = MaterialTheme.typography.labelSmall, color = RROnSurfaceSubtle, modifier = Modifier.padding(end = 6.dp))
                                 Text(title, style = MaterialTheme.typography.labelSmall, color = RROnSurfaceMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
-                        }
-                        if (childTitles.size > 4) {
-                            Text("  +${childTitles.size - 4} more", style = MaterialTheme.typography.labelSmall, color = RROnSurfaceSubtle)
                         }
                     }
                 }
