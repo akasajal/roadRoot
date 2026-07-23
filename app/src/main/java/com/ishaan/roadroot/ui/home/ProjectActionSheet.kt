@@ -29,6 +29,7 @@ fun ProjectActionSheet(
     onDismiss: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
+    onOpenGraph: () -> Unit,
     viewModel: ProjectViewModel = hiltViewModel(),
     exportViewModel: ExportViewModel = hiltViewModel()
 ) {
@@ -58,6 +59,7 @@ fun ProjectActionSheet(
             HorizontalDivider(color = RRBorder)
             Spacer(Modifier.height(12.dp))
 
+            ActionRow(Icons.Outlined.AccountTree, "Graph View") { onOpenGraph(); onDismiss() }
             ActionRow(Icons.Outlined.DriveFileRenameOutline, "Rename") { showRename = true }
             ActionRow(Icons.Outlined.IosShare, "Export") { showExport = true }
             ActionRow(Icons.Outlined.DeleteOutline, "Delete", tint = RRError) { onDelete(); onDismiss() }

@@ -37,6 +37,7 @@ fun HomeScreen(
     onOpenSearch: () -> Unit,
     onOpenStats: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenGraph: (Long) -> Unit,
     viewModel: ProjectViewModel = hiltViewModel()
 ) {
     val projects by viewModel.projects.collectAsState()
@@ -175,7 +176,8 @@ fun HomeScreen(
             project = project,
             onDismiss = { projectToAction = null },
             onRename = {},
-            onDelete = { projectToDelete = project; projectToAction = null }
+            onDelete = { projectToDelete = project; projectToAction = null },
+            onOpenGraph = { onOpenGraph(project.id) }
         )
     }
 

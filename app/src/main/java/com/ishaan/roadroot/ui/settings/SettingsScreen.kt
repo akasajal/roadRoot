@@ -25,7 +25,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val currentTheme by viewModel.theme.collectAsState()
+    val theme by viewModel.theme.collectAsState()
 
     Scaffold(
         topBar = {
@@ -51,37 +51,42 @@ fun SettingsScreen(
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             item {
-                Text(
-                    text = "Appearance",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = RROnSurfaceMuted,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
+                SectionHeader("Appearance")
             }
             
             item {
                 ThemeOption(
                     title = "System Default",
-                    selected = currentTheme == AppTheme.SYSTEM,
+                    selected = theme == AppTheme.SYSTEM,
                     onClick = { viewModel.setTheme(AppTheme.SYSTEM) }
                 )
             }
             item {
                 ThemeOption(
                     title = "Light",
-                    selected = currentTheme == AppTheme.LIGHT,
+                    selected = theme == AppTheme.LIGHT,
                     onClick = { viewModel.setTheme(AppTheme.LIGHT) }
                 )
             }
             item {
                 ThemeOption(
                     title = "Dark",
-                    selected = currentTheme == AppTheme.DARK,
+                    selected = theme == AppTheme.DARK,
                     onClick = { viewModel.setTheme(AppTheme.DARK) }
                 )
             }
         }
     }
+}
+
+@Composable
+private fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.labelMedium,
+        color = RROnSurfaceMuted,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+    )
 }
 
 @Composable

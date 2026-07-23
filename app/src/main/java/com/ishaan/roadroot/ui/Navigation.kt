@@ -12,6 +12,7 @@ import com.ishaan.roadroot.ui.roadmap.RoadmapScreen
 import com.ishaan.roadroot.ui.search.SearchScreen
 import com.ishaan.roadroot.ui.settings.SettingsScreen
 import com.ishaan.roadroot.ui.stats.StatsScreen
+import com.ishaan.roadroot.ui.graph.GraphViewScreen
 import com.ishaan.roadroot.viewmodel.ProjectViewModel
 
 @Composable
@@ -31,7 +32,8 @@ fun RoadRootNavGraph() {
                 },
                 onOpenSearch = { navController.navigate("search") },
                 onOpenStats = { navController.navigate("stats") },
-                onOpenSettings = { navController.navigate("settings") }
+                onOpenSettings = { navController.navigate("settings") },
+                onOpenGraph = { projectId -> navController.navigate("graph/$projectId") }
             )
         }
 
@@ -50,6 +52,13 @@ fun RoadRootNavGraph() {
 
         composable("settings") {
             SettingsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(
+            route = "graph/{projectId}",
+            arguments = listOf(navArgument("projectId") { type = NavType.LongType })
+        ) {
+            GraphViewScreen(onBack = { navController.popBackStack() })
         }
 
         composable(
