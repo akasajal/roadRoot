@@ -30,7 +30,10 @@ fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val overallPercent = if (state.totalItems == 0) 0f else (state.doneItems + state.discardedItems).toFloat() / state.totalItems
+    val totalItems = state.totalItems
+    val donePercent = if (totalItems == 0) 0f else state.doneItems.toFloat() / totalItems
+    val discardedPercent = if (totalItems == 0) 0f else state.discardedItems.toFloat() / totalItems
+    val inProgressPercent = if (totalItems == 0) 0f else (state.inProgressItems * 0.5f) / totalItems
 
     Column(modifier = Modifier.fillMaxSize().background(RRBackground)) {
         Row(
@@ -59,7 +62,11 @@ fun StatsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        OverallRing(progress = overallPercent)
+                        OverallRing(
+                            donePercent = donePercent,
+                            discardedPercent = discardedPercent,
+                            inProgressPercent = inProgressPercent
+                        )
                         Spacer(Modifier.height(20.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -88,10 +95,16 @@ fun StatsScreen(
 }
 
 @Composable
-private fun OverallRing(progress: Float) {
-    val animatedProgress by animateFloatAsState(
-        targetValue = progress, animationSpec = tween(1000), label = "ring"
-    )
+private fun OverallRing(
+    donePercent: Float,
+    discardedPercent: Float,
+    inProgressPercent: Float
+) {
+    val totalProgress = donePercent + discardedPercent + inProgressPercent
+    val animatedDone by animateFloatAsState(targetValue = donePercent, animationSpec = tween(1000), label = "done")
+    val animatedDiscarded by animateFloatAsState(targetValue = discardedPercent, animationSpec = tween(1000), label = "discarded")
+    val animatedInProgress by animateFloatAsState(targetValue = inProgressPercent, animationSpec = tween(1000), label = "inProgress")
+
     Box(modifier = Modifier.size(140.dp), contentAlignment = Alignment.Center) {
         CircularProgressIndicator(
             progress = { 1f },
@@ -100,15 +113,31 @@ private fun OverallRing(progress: Float) {
             strokeWidth = 10.dp,
             strokeCap = StrokeCap.Round
         )
+        // Discarded (bottom layer of progress)
         CircularProgressIndicator(
-            progress = { animatedProgress },
+            progress = { animatedDone + animatedDiscarded + animatedInProgress },
+            modifier = Modifier.fillMaxSize(),
+            color = RRStatusInProgress,
+            strokeWidth = 10.dp,
+            strokeCap = StrokeCap.Round
+        )
+        CircularProgressIndicator(
+            progress = { animatedDone + animatedDiscarded },
+            modifier = Modifier.fillMaxSize(),
+            color = RRStatusDiscarded,
+            strokeWidth = 10.dp,
+            strokeCap = StrokeCap.Round
+        )
+        CircularProgressIndicator(
+            progress = { animatedDone },
             modifier = Modifier.fillMaxSize(),
             color = RRStatusDone,
             strokeWidth = 10.dp,
             strokeCap = StrokeCap.Round
         )
+
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("${(animatedProgress * 100).toInt()}%", style = MaterialTheme.typography.headlineLarge, color = RROnBackground)
+            Text("${(totalProgress * 100).toInt()}%", style = MaterialTheme.typography.headlineLarge, color = RROnBackground)
             Text("complete", style = MaterialTheme.typography.labelSmall, color = RROnSurfaceMuted)
         }
     }
@@ -125,9 +154,10 @@ private fun StatCell(label: String, value: String) {
 @Composable
 private fun ProjectStatCard(stat: ProjectStat) {
     val accent = ProjectAccent.fromArgb(stat.project.accentColor)
-    val animatedProgress by animateFloatAsState(
-        targetValue = stat.percent / 100f, animationSpec = tween(800), label = "bar"
-    )
+    val animatedDone by animateFloatAsState(targetValue = stat.donePercent, animationSpec = tween(800), label = "done")
+    val animatedDiscarded by animateFloatAsState(targetValue = stat.discardedPercent, animationSpec = tween(800), label = "discarded")
+    val animatedInProgress by animateFloatAsState(targetValue = stat.inProgressPercent, animationSpec = tween(800), label = "inProgress")
+    
     Box(
         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))
             .background(RRSurfaceVariant).padding(horizontal = 16.dp, vertical = 14.dp)
@@ -143,7 +173,21 @@ private fun ProjectStatCard(stat: ProjectStat) {
             }
             Spacer(Modifier.height(8.dp))
             Box(modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(RRSurfaceElevated)) {
-                Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(animatedProgress).clip(RoundedCornerShape(2.dp)).background(accent.color))
+                Row(modifier = Modifier.fillMaxSize()) {
+                    if (animatedDone > 0f) {
+                        Box(modifier = Modifier.fillMaxHeight().weight(animatedDone).background(RRStatusDone))
+                    }
+                    if (animatedDiscarded > 0f) {
+                        Box(modifier = Modifier.fillMaxHeight().weight(animatedDiscarded).background(RRStatusDiscarded))
+                    }
+                    if (animatedInProgress > 0f) {
+                        Box(modifier = Modifier.fillMaxHeight().weight(animatedInProgress).background(RRStatusInProgress))
+                    }
+                    val totalProgress = stat.donePercent + stat.discardedPercent + stat.inProgressPercent
+                    if (totalProgress < 1f) {
+                        Spacer(modifier = Modifier.weight(1f - totalProgress))
+                    }
+                }
             }
         }
     }

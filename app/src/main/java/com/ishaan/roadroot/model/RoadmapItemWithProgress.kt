@@ -1,20 +1,22 @@
 package com.ishaan.roadroot.model
 
 /**
- * A RoadmapItem decorated with computed progress.
- * progress: 0.0 to 1.0
- * childCount: direct children count
- * isLeaf: true if this item has no children
+ * A RoadmapItem decorated with computed progress composition.
  */
 data class RoadmapItemWithProgress(
     val item: RoadmapItem,
-    val progress: Float,
+    val doneProgress: Float,
+    val discardedProgress: Float,
+    val inProgressProgress: Float,
     val childCount: Int,
     val isLeaf: Boolean
 ) {
+    val progress: Float get() = doneProgress + discardedProgress + inProgressProgress
+
     val effectiveStatus: ItemStatus
         get() = if (isLeaf) item.status else when {
-            progress >= 1f -> ItemStatus.DONE
+            doneProgress >= 1f -> ItemStatus.DONE
+            discardedProgress >= 1f -> ItemStatus.DISCARDED
             progress > 0f -> ItemStatus.IN_PROGRESS
             else -> ItemStatus.TODO
         }

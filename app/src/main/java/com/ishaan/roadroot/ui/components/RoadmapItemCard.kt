@@ -35,11 +35,9 @@ fun RoadmapItemCard(
     // Caller passes Modifier.draggableHandle(...) from reorderable; null = no handle shown
     dragModifier: Modifier? = null
 ) {
-    val animatedProgress by animateFloatAsState(
-        targetValue = item.progress,
-        animationSpec = tween(600),
-        label = "progress"
-    )
+    val animatedDone by animateFloatAsState(targetValue = item.doneProgress, animationSpec = tween(600), label = "done")
+    val animatedDiscarded by animateFloatAsState(targetValue = item.discardedProgress, animationSpec = tween(600), label = "discarded")
+    val animatedInProgress by animateFloatAsState(targetValue = item.inProgressProgress, animationSpec = tween(600), label = "inProgress")
 
     val statusColor = when (item.effectiveStatus) {
         ItemStatus.DONE -> RRStatusDone
@@ -146,7 +144,20 @@ fun RoadmapItemCard(
                             modifier = Modifier.weight(1f).height(3.dp)
                                 .clip(RoundedCornerShape(2.dp)).background(RRSurfaceElevated)
                         ) {
-                            Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(animatedProgress).clip(RoundedCornerShape(2.dp)).background(statusColor))
+                            Row(modifier = Modifier.fillMaxSize()) {
+                                if (animatedDone > 0f) {
+                                    Box(modifier = Modifier.fillMaxHeight().weight(animatedDone).background(RRStatusDone))
+                                }
+                                if (animatedDiscarded > 0f) {
+                                    Box(modifier = Modifier.fillMaxHeight().weight(animatedDiscarded).background(RRStatusDiscarded))
+                                }
+                                if (animatedInProgress > 0f) {
+                                    Box(modifier = Modifier.fillMaxHeight().weight(animatedInProgress).background(RRStatusInProgress))
+                                }
+                                if (item.progress < 1f) {
+                                    Spacer(modifier = Modifier.weight(1f - item.progress))
+                                }
+                            }
                         }
                         Spacer(Modifier.width(10.dp))
                         Text("${item.progressPercent}%", style = MaterialTheme.typography.labelSmall, color = statusColor)

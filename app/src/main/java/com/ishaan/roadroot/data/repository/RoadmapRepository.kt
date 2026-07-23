@@ -36,6 +36,12 @@ class RoadmapRepository @Inject constructor(
         }
     }
 
+    private data class ProgressComposition(
+        val done: Float = 0f,
+        val discarded: Float = 0f,
+        val inProgress: Float = 0f
+    )
+
     suspend fun duplicateItem(item: RoadmapItem, newParentId: Long?): Long {
         val newId = dao.insertItem(
             item.copy(id = 0, parentId = newParentId, title = "${item.title} (copy)", createdAt = System.currentTimeMillis())
@@ -44,17 +50,24 @@ class RoadmapRepository @Inject constructor(
         return newId
     }
 
-    suspend fun computeProgress(itemId: Long, allItems: List<RoadmapItem>): Float {
+    private fun computeProgressInternal(itemId: Long, allItems: List<RoadmapItem>): ProgressComposition {
         val children = allItems.filter { it.parentId == itemId }
         if (children.isEmpty()) {
-            return when (allItems.find { it.id == itemId }?.status) {
-                ItemStatus.DONE, ItemStatus.DISCARDED -> 1f
-                ItemStatus.IN_PROGRESS -> 0.5f
-                ItemStatus.TODO,
-                null -> 0f
+            val item = allItems.find { it.id == itemId }
+            return when (item?.status) {
+                ItemStatus.DONE -> ProgressComposition(done = 1f)
+                ItemStatus.DISCARDED -> ProgressComposition(discarded = 1f)
+                ItemStatus.IN_PROGRESS -> ProgressComposition(inProgress = 0.5f)
+                ItemStatus.TODO, null -> ProgressComposition()
             }
         }
-        return children.map { computeProgress(it.id, allItems) }.average().toFloat()
+        val compositions = children.map { computeProgressInternal(it.id, allItems) }
+        val count = compositions.size.toFloat()
+        return ProgressComposition(
+            done = compositions.sumOf { it.done.toDouble() }.toFloat() / count,
+            discarded = compositions.sumOf { it.discarded.toDouble() }.toFloat() / count,
+            inProgress = compositions.sumOf { it.inProgress.toDouble() }.toFloat() / count
+        )
     }
 
     suspend fun getItemsWithProgress(projectId: Long, parentId: Long?): List<RoadmapItemWithProgress> {
@@ -66,13 +79,24 @@ class RoadmapRepository @Inject constructor(
         return scopeItems.map { item ->
             val childCount = allItems.count { it.parentId == item.id }
             val isLeaf = childCount == 0
-            val progress = if (isLeaf) when (item.status) {
-                ItemStatus.DONE -> 1f
-                ItemStatus.IN_PROGRESS -> 0.5f
-                ItemStatus.TODO,
-                ItemStatus.DISCARDED -> 1f
-            } else computeProgress(item.id, allItems)
-            RoadmapItemWithProgress(item = item, progress = progress, childCount = childCount, isLeaf = isLeaf)
+            val comp = if (isLeaf) {
+                when (item.status) {
+                    ItemStatus.DONE -> ProgressComposition(done = 1f)
+                    ItemStatus.DISCARDED -> ProgressComposition(discarded = 1f)
+                    ItemStatus.IN_PROGRESS -> ProgressComposition(inProgress = 0.5f)
+                    ItemStatus.TODO -> ProgressComposition()
+                }
+            } else {
+                computeProgressInternal(item.id, allItems)
+            }
+            RoadmapItemWithProgress(
+                item = item,
+                doneProgress = comp.done,
+                discardedProgress = comp.discarded,
+                inProgressProgress = comp.inProgress,
+                childCount = childCount,
+                isLeaf = isLeaf
+            )
         }
     }
 
@@ -93,4 +117,5 @@ class RoadmapRepository @Inject constructor(
     suspend fun getTotalCount(projectId: Long) = dao.getTotalCount(projectId)
     suspend fun getDoneCount(projectId: Long) = dao.getDoneCount(projectId)
     suspend fun getDiscardedCount(projectId: Long) = dao.getDiscardedCount(projectId)
+    suspend fun getInProgressCount(projectId: Long) = dao.getInProgressCount(projectId)
 }

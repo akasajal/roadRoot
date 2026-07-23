@@ -78,6 +78,8 @@ interface RoadmapItemDao {
     suspend fun getDoneCount(projectId: Long): Int
     @Query("SELECT COUNT(*) FROM roadmap_items WHERE projectId = :projectId AND status = 'DISCARDED'")
     suspend fun getDiscardedCount(projectId: Long): Int
+    @Query("SELECT COUNT(*) FROM roadmap_items WHERE projectId = :projectId AND status = 'IN_PROGRESS'")
+    suspend fun getInProgressCount(projectId: Long): Int
 
     @Query("SELECT COUNT(*) FROM roadmap_items WHERE projectId = :projectId AND parentId NOT IN (SELECT id FROM roadmap_items WHERE projectId = :projectId) OR (projectId = :projectId AND id NOT IN (SELECT DISTINCT parentId FROM roadmap_items WHERE parentId IS NOT NULL AND projectId = :projectId))")
     suspend fun getLeafCount(projectId: Long): Int
