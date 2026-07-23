@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.ishaan.roadroot.data.repository.ProjectRepository
 import com.ishaan.roadroot.data.repository.RoadmapRepository
 import com.ishaan.roadroot.model.Project
+import com.ishaan.roadroot.model.ProjectAccent
 import com.ishaan.roadroot.model.RoadmapItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.cos
 import kotlin.math.sin
+import androidx.compose.ui.graphics.Color
 
 data class GraphNode(
     val id: Long,
@@ -42,11 +44,35 @@ class GraphViewModel @Inject constructor(
     private val _project = MutableStateFlow<Project?>(null)
     val project = _project.asStateFlow()
 
+    private val _highlightedNodeId = MutableStateFlow<Long?>(null)
+    val highlightedNodeId = _highlightedNodeId.asStateFlow()
+
+    private val _highlightColor = MutableStateFlow<Color?>(null)
+    val highlightColor = _highlightColor.asStateFlow()
+
     val nodes = mutableStateListOf<GraphNode>()
     val edges = mutableStateListOf<GraphEdge>()
 
     init {
         loadData()
+    }
+
+    fun onNodeTapped(nodeId: Long) {
+        if (_highlightedNodeId.value == nodeId) {
+            clearHighlight()
+        } else {
+            _highlightedNodeId.value = nodeId
+            
+            // Pick a random accent color except the project's accent
+            val projectAccent = _project.value?.accentColor ?: ProjectAccent.GREEN.argb
+            val otherAccents = ProjectAccent.entries.filter { it.argb != projectAccent }
+            _highlightColor.value = otherAccents.random().color
+        }
+    }
+
+    fun clearHighlight() {
+        _highlightedNodeId.value = null
+        _highlightColor.value = null
     }
 
     private fun loadData() {
