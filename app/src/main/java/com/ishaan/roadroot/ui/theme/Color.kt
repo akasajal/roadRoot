@@ -1,33 +1,35 @@
 package com.ishaan.roadroot.ui.theme
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// RoadRoot palette — dark-first, structural, mineral
-// Primary surface: near-black with a cool blue undertone
-val RRBackground = Color(0xFF0E1117)
-val RRSurface = Color(0xFF161B26)
-val RRSurfaceVariant = Color(0xFF1E2535)
-val RRSurfaceElevated = Color(0xFF242C3D)
+// RoadRoot palette — using MaterialTheme where possible for dynamic colors
+val RRBackground: Color @Composable get() = MaterialTheme.colorScheme.background
+val RRSurface: Color @Composable get() = MaterialTheme.colorScheme.surface
+val RRSurfaceVariant: Color @Composable get() = MaterialTheme.colorScheme.surfaceVariant
+val RRSurfaceElevated: Color @Composable get() = LocalExtendedColors.current.surfaceElevated
 
-// Accent: mineral green — precise, not trendy
-val RRAccent = Color(0xFF4ADE80)          // vivid leaf green
-val RRAccentDim = Color(0xFF22C55E)
-val RRAccentContainer = Color(0xFF14532D) // dark green container
+val RRAccent: Color @Composable get() = MaterialTheme.colorScheme.primary
+val RRAccentContainer: Color @Composable get() = MaterialTheme.colorScheme.primaryContainer
 
-// Text
-val RROnBackground = Color(0xFFE2E8F0)    // near-white, slightly cool
-val RROnSurface = Color(0xFFCBD5E1)
-val RROnSurfaceMuted = Color(0xFF64748B)
-val RROnSurfaceSubtle = Color(0xFF334155)
+val RROnBackground: Color @Composable get() = MaterialTheme.colorScheme.onBackground
+val RROnSurface: Color @Composable get() = MaterialTheme.colorScheme.onSurface
+val RROnSurfaceMuted: Color @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
+val RROnSurfaceSubtle: Color @Composable get() = LocalExtendedColors.current.onSurfaceSubtle
 
-// Status colors
-val RRStatusDone = Color(0xFF4ADE80)
-val RRStatusInProgress = Color(0xFFFBBF24)
-val RRStatusTodo = Color(0xFF475569)
-val RRStatusDiscarded = Color(0xFFCB4C4E)
+val RRStatusDone: Color @Composable get() = LocalExtendedColors.current.statusDone
+val RRStatusInProgress: Color @Composable get() = LocalExtendedColors.current.statusInProgress
+val RRStatusTodo: Color @Composable get() = LocalExtendedColors.current.statusTodo
+val RRStatusDiscarded: Color @Composable get() = LocalExtendedColors.current.statusDiscarded
 
-// Divider / border
-val RRBorder = Color(0xFF1E293B)
+val RRBorder: Color @Composable get() = MaterialTheme.colorScheme.outline
+val RRError: Color @Composable get() = MaterialTheme.colorScheme.error
 
-// Error
-val RRError = Color(0xFFF87171)
+// Static accent colors for project items (used in ProjectAccent enum)
+val RRProjectGreen = Color(0xFF4ADE80)
+val RRProjectBlue = Color(0xFF60A5FA)
+val RRProjectPurple = Color(0xFFA78BFA)
+val RRProjectOrange = Color(0xFFFBBF24)
+val RRProjectRose = Color(0xFFFB7185)
+val RRProjectSlate = Color(0xFF94A3B8)

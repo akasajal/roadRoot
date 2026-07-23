@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.ishaan.roadroot.ui.home.HomeScreen
 import com.ishaan.roadroot.ui.roadmap.RoadmapScreen
 import com.ishaan.roadroot.ui.search.SearchScreen
+import com.ishaan.roadroot.ui.settings.SettingsScreen
 import com.ishaan.roadroot.ui.stats.StatsScreen
 import com.ishaan.roadroot.viewmodel.ProjectViewModel
 
@@ -29,7 +30,8 @@ fun RoadRootNavGraph() {
                     navController.navigate("roadmap/$projectId/$name/-1")
                 },
                 onOpenSearch = { navController.navigate("search") },
-                onOpenStats = { navController.navigate("stats") }
+                onOpenStats = { navController.navigate("stats") },
+                onOpenSettings = { navController.navigate("settings") }
             )
         }
 
@@ -44,6 +46,10 @@ fun RoadRootNavGraph() {
 
         composable("stats") {
             StatsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable("settings") {
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
 
         composable(

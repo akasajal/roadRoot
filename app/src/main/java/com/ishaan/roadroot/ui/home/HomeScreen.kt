@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AccountTree
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ fun HomeScreen(
     onOpenProject: (Long) -> Unit,
     onOpenSearch: () -> Unit,
     onOpenStats: () -> Unit,
+    onOpenSettings: () -> Unit,
     viewModel: ProjectViewModel = hiltViewModel()
 ) {
     val projects by viewModel.projects.collectAsState()
@@ -105,6 +107,9 @@ fun HomeScreen(
                     }
                     IconButton(onClick = onOpenStats) {
                         Icon(Icons.Outlined.BarChart, "Stats", tint = RROnSurfaceMuted)
+                    }
+                    IconButton(onClick = onOpenSettings) {
+                        Icon(Icons.Outlined.Settings, "Settings", tint = RROnSurfaceMuted)
                     }
                 }
 
