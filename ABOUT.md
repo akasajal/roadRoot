@@ -84,11 +84,15 @@ Roadmap items are self-referential, allowing unlimited nesting depth without art
 
 ---
 
-## Automatic Progress Tracking
+## Advanced Progress Tracking
 
-Project completion percentages are calculated automatically based on the completion state of roadmap items.
+Project completion is calculated automatically through a recursive weighted algorithm that distinguishes between:
 
-Progress updates instantly as milestones are completed.
+- **Completed Items**: Contributing to the primary progress segment.
+- **Discarded Items**: Visually distinct from completed work.
+- **In-Progress Items**: Representing active development.
+
+Progress bars utilize a multi-segment visual system to provide an immediate breakdown of project health.
 
 ---
 
@@ -101,6 +105,31 @@ Each project includes a dedicated description for documenting objectives, requir
 ## Roadmap Item Descriptions
 
 Every milestone can contain its own detailed description, making it suitable for implementation notes, documentation, or specifications.
+
+---
+
+## Graph View
+
+Visualize project roadmaps as interactive, force-balanced networks. 
+
+The Graph View utilizes a smart weighted radial layout to represent hierarchy through spatial distancing and node opacity. Features include:
+
+- **Node Highlighting**: Tap any node to focus on its immediate parent and children.
+- **Hierarchical Depth**: Visual depth cues through dynamic translucency.
+- **Interactive Gestures**: High-performance pinch-to-zoom and panning.
+- **Stable Layout**: A deterministic algorithm ensures project trees are organized and predictable.
+
+---
+
+## Adaptive Theming
+
+RoadRoot supports multiple visual configurations to suit any environment:
+
+- **Dark Mode**: High-contrast, mineral-inspired dark interface.
+- **Light Mode**: Clean, high-legibility light interface.
+- **System Default**: Automatically synchronizes with Android system settings.
+
+Theme preferences are persisted across sessions.
 
 ---
 

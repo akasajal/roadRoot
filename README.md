@@ -22,7 +22,7 @@ Built with modern Android development practices, the project utilizes the **MVVM
 * **Design System:** Material Design 3 (M3)
 * **Asynchronous Programming:** Kotlin Coroutines & `StateFlow`
 * **Dependency Injection:** Dagger Hilt
-* **Local Persistence:** Room Database (SQLite abstraction)
+* **Local Persistence:** Room Database & Jetpack DataStore
 
 ---
 
@@ -30,9 +30,10 @@ Built with modern Android development practices, the project utilizes the **MVVM
 
 * **Multi-Project Management:** Create, organize, and maintain independent project roadmaps simultaneously.
 * **Milestone & Task Tracking:** Add, edit, and remove granular roadmap items to monitor development lifecycles.
-* **Dynamic Visual Customization:** Assign custom accent colors to individual projects for distinct visual organization.
-* **Real-Time Progress Metrics:** Automated progress tracking that dynamically updates as milestones are achieved.
-* **Offline-First Architecture:** Reliable local data persistence powered by Room Database, ensuring zero data loss and instant load times.
+* **Interactive Graph View:** Visualize project roadmaps as structured, interactive networks with smart hierarchical layout and node highlighting.
+* **Advanced Progress Metrics:** Automated tracking that distinguishes between completed, discarded, and active tasks through multi-segment visual bars.
+* **Full Theme Support:** Seamlessly switch between Light, Dark, and System Default themes for a personalized visual experience.
+* **Offline-First Architecture:** Reliable local data persistence powered by Room and DataStore, ensuring zero data loss and instant load times.
 
 ---
 
@@ -53,6 +54,7 @@ app/
 │   ├── home/            # Home screen view and navigation
 │   ├── roadmap/         # Roadmap timeline and task execution views
 │   ├── search/          # Search Project and items
+│   ├── settings/        # Persistent app preferences and settings
 │   ├── stats/           # Statistics view
 │   └── theme/           # Material 3 styling, colors, and typography
 └── viewmodel/           # UI state management and business logic
